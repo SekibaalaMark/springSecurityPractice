@@ -1,4 +1,4 @@
-package com.cit.SpringSecExClaude.Controllers;
+package com.cit.SpringSecExClaude.Controller;
 
 import com.cit.SpringSecExClaude.Repository.UserRepository;
 import com.cit.SpringSecExClaude.dto.RegisterRequest;

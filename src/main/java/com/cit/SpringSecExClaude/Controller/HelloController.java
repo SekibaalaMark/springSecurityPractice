@@ -1,4 +1,4 @@
-package com.cit.SpringSecExClaude.Controllers;
+package com.cit.SpringSecExClaude.Controller;
 
 
 import org.springframework.web.bind.annotation.GetMapping;

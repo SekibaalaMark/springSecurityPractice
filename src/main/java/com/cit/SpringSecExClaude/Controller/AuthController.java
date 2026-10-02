@@ -2,8 +2,11 @@ package com.cit.SpringSecExClaude.Controller;
 
 import com.cit.SpringSecExClaude.Repository.UserRepository;
 import com.cit.SpringSecExClaude.dto.LoginRequest;
+import com.cit.SpringSecExClaude.dto.LoginResponse;
 import com.cit.SpringSecExClaude.dto.RegisterRequest;
 import com.cit.SpringSecExClaude.model.User;
+import com.cit.SpringSecExClaude.service.JwtService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,18 +21,14 @@ import org.springframework.security.core.AuthenticationException;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
-
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
@@ -43,16 +42,15 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered");
     }
 
-
-
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     UsernamePasswordAuthenticationToken.unauthenticated(
                             request.username(), request.password()));
 
-            return ResponseEntity.ok("Login successful for " + authentication.getName());
+            String token = jwtService.generateToken(authentication.getName());
+            return ResponseEntity.ok(new LoginResponse(token));
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
